@@ -1,15 +1,20 @@
 import mongoose from 'mongoose';
 import { logger } from '@utils/logger';
 async function mongoConnect(): Promise<typeof mongoose> {
-  const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/dns';
-  const dbCredentials = {
-    user: process.env.MONGODB_USERNAME || '',
-    pass: process.env.MONGODB_PASSWORD || '',
+  const dbUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/';
+  const dbUsername = process.env.MONGO_USERNAME || 'dnsuser';
+  const dbPassword = process.env.MONGO_PASSWORD || 'dnspass';
+  const dbName = process.env.MONGO_DB || 'dns-lookup'
+  const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    authSource: 'admin',
+    user: dbUsername,
+    pass: dbPassword,
   };
-  const connectionString = `${dbUri}?${new URLSearchParams(dbCredentials)}`;
 
   try {
-    const connection = await mongoose.connect(connectionString);
+    const connection = await mongoose.connect(dbUrl + dbName, options);
     logger.info('Connected to MongoDB successfully');
     return connection;
   } catch (err) {
@@ -17,4 +22,4 @@ async function mongoConnect(): Promise<typeof mongoose> {
   }
 }
 
-export default{ mongoConnect };
+export default { mongoConnect };
