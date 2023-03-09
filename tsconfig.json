@@ -12,7 +12,8 @@
       "@bootstrap/*": ["src/bootstrap/*"],
       "@models/*": ["src/models/*"],
       "@repositories/*": ["src/repositories/*"],
-      "@interfaces/*": ["src/interfaces/*"]
+      "@interfaces/*": ["src/interfaces/*"],
+      "@services/*": ["src/services/*"]
     }
   },
   "include": ["src/**/*.ts"],

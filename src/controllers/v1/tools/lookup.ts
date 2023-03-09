@@ -1,39 +1,40 @@
 import { Request, Response } from 'express';
-import extractDomain from 'extract-domain';
-import * as dnsPromises from 'node:dns/promises';
 import { logger } from '@utils/logger';
-import { LookupAddress } from 'node:dns';
 import { IDomain } from '@interfaces/domain.interface';
-import { createDomain } from '@repositories/domain';
+import { createDomain, getByDomain } from '@repositories/domain';
+import { extractDomainHost, lookupDomainHost } from '@services/domainServices';
 
 export const lookupControllerHandler = async (req: Request, res: Response) => {
   logger.info('Look up controller handler started');
   const { domain = '' } = req.query;
-  const regexForDomain = /[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/;
-  if (!regexForDomain.test(domain.toString())) {
-    logger.error(`${domain} is not a correct format and regex result is ${regexForDomain.test(domain.toString())}`);
-    res.status(400).send('Please send correct domain format.');
-    return;
-  }
-  const parsedDomain = extractDomain(domain.toString(), { tld: true });
-  logger.info('extracted domain part is: ', parsedDomain);
-  let address: LookupAddress;
+  const host = extractDomainHost(domain.toString());
+  let domainAddress: IDomain;
   try {
-    address = await dnsPromises.lookup(parsedDomain, 4);
-    logger.info('Address for extracted domain is: ', address);
+    domainAddress = await getByDomain(host);
+    logger.info('domain found in DB', domain, domainAddress);
+    if (!req.timedout) {
+      res.status(200).send(domainAddress!.ip);
+    }
+    return
+    
   } catch (error) {
+    logger.error('Error happened in lookupControllerHandler', error);
+  }
+  try {
+    domainAddress = await lookupDomainHost(host);
+  } catch (error) {
+    logger.error('Error happened in lookupControllerHandler', error);
     if (!req.timedout) {
       res.status(400).send((error as Error).message);
       return;
     }
+    return 
   }
-
   try {
-    const domain: IDomain = { ip: address!.address, domain: parsedDomain };
-    await createDomain(domain);
+    await createDomain(domainAddress!);
     logger.info('domain created in DB', domain, { isTimeout: req.timedout });
     if (!req.timedout) {
-      res.status(200).send(address!.address);
+      res.status(200).send(domainAddress!.ip);
     }
   } catch (error) {
     logger.error('Error happened in lookupControllerHandler', error);

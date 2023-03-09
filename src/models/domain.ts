@@ -4,7 +4,10 @@ const Domain = mongoose.model(
   'Domain',
   mongoose.Schema(
     {
-      domain: String,
+      domain: {
+        type: String, 
+        unique: true
+      },
       ip: String,
     },
     { timestamps: true }

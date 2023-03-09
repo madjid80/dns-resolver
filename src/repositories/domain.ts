@@ -5,4 +5,8 @@ async function createDomain(domain: IDomain) {
   return Domain.create(domain);
 }
 
-export { createDomain };
+async function getByDomain(domain: string) {
+  return Domain.findOne({domain});
+}
+
+export { createDomain,getByDomain  };
