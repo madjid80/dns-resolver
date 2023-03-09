@@ -1,7 +1,7 @@
 import { IQuery } from '@interfaces/query';
 import Query from '@models/query';
 
-async function createOrUpdateQuery(query: IQuery) {
+async function createOrUpdateQuery(query: IQuery):Promise<IQuery> {
   return Query.updateOne(
     { domain: query.domain },
     { $set: { addresses: query.addresses, clientIp: query.clientIp } },
@@ -9,8 +9,12 @@ async function createOrUpdateQuery(query: IQuery) {
   );
 }
 
-async function getByDomain(query: string) {
+async function getByDomain(query: string):Promise<IQuery> {
   return Query.findOne({ query });
 }
 
-export { createOrUpdateQuery, getByDomain };
+async function getAllQuery(): Promise<IQuery[]> {
+  return Query.find().sort({ createdAt: -1 }).limit(20);
+}
+
+export { createOrUpdateQuery, getByDomain, getAllQuery };
