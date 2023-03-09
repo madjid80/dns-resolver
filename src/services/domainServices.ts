@@ -9,7 +9,7 @@ function extractDomainHost(requestedDomain: string): string {
   const isValidate = regexForDomain.test(requestedDomain);
   if (!isValidate) {
     logger.error(`${requestedDomain} is not a correct format and regex result is ${isValidate}`);
-    throw new Error('Please send correct domain format.');
+    throw {status: 400, message: 'Please send correct domain format.'};
   }
   const parsedDomain = extractDomain(requestedDomain, { tld: true });
   logger.info('extracted domain part is: ', parsedDomain);
@@ -26,7 +26,8 @@ async function lookupDomainHost(query: IQuery): Promise<IQuery> {
     }
     return query;
   } catch (error) {
-    throw error;
+    logger.error(error)
+    throw {status: 400, message: (error as Error).message};
   }
 }
 

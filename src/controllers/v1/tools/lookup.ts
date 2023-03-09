@@ -7,9 +7,9 @@ import { extractDomainHost, lookupDomainHost } from '@services/domainServices';
 export const lookupControllerHandler = async (req: Request, res: Response) => {
   logger.info('Look up controller handler started');
   const { domain = '' } = req.query;
-  const host = extractDomainHost(domain.toString());
   var clientIp: string = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress as string;
   try {
+    const host = extractDomainHost(domain.toString());
     let query: IQuery = await getByDomain(host);
     logger.info('query in DB', domain, query);
     if (!query) {
