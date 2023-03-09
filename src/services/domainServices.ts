@@ -1,4 +1,4 @@
-import { IDomain } from '@interfaces/domain.interface';
+import { IQuery } from '@interfaces/query';
 import { logger } from '@utils/logger';
 import extractDomain from 'extract-domain';
 import * as dnsPromises from 'node:dns/promises';
@@ -16,15 +16,15 @@ function extractDomainHost(requestedDomain: string): string {
   return parsedDomain;
 }
 
-async function lookupDomainHost(host: IDomain): Promise<IDomain> {
+async function lookupDomainHost(query: IQuery): Promise<IQuery> {
   let address: LookupAddress;
   try {
-    address = await dnsPromises.lookup(host.domain, 4);
+    address = await dnsPromises.lookup(query.domain, 4);
     logger.info('Address for extracted domain is: ', address);
-    if(host.addresses.findIndex(item => item.ip === address.address) === -1){
-      host.addresses.push({ip: address.address})
+    if(query.addresses.findIndex(item => item.ip === address.address) === -1){
+      query.addresses.push({ip: address.address})
     }
-    return host;
+    return query;
   } catch (error) {
     throw error;
   }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const Domain = mongoose.model(
-  'Domain',
+const Query = mongoose.model(
+  'Query',
   mongoose.Schema({
     domain: {
       type: String,
@@ -12,7 +12,8 @@ const Domain = mongoose.model(
         ip: String,
       },
     ],
+    clientIp: String
   },{timestamps: true})
 );
 
-export default Domain;
+export default Query;

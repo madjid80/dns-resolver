@@ -1,29 +1,30 @@
 import { Request, Response } from 'express';
 import { logger } from '@utils/logger';
-import { IDomain } from '@interfaces/domain.interface';
-import { createOrUpdateDomain, getByDomain } from '@repositories/domain';
+import { IQuery } from '@interfaces/query';
+import { createOrUpdateQuery, getByDomain } from '@repositories/query';
 import { extractDomainHost, lookupDomainHost } from '@services/domainServices';
 
 export const lookupControllerHandler = async (req: Request, res: Response) => {
   logger.info('Look up controller handler started');
   const { domain = '' } = req.query;
   const host = extractDomainHost(domain.toString());
-
+  var clientIp: string = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress as string;
   try {
-    let domainAddress: IDomain = await getByDomain(host);
-    logger.info('domain in DB', domain, domainAddress);
-    if (!domainAddress) {
-      domainAddress = { domain: host, addresses: [], createdAt: new Date().toISOString() };
+    let query: IQuery = await getByDomain(host);
+    logger.info('query in DB', domain, query);
+    if (!query) {
+      query = { domain: host, addresses: [], createdAt: new Date().toISOString(), clientIp };
     }
-    domainAddress = await lookupDomainHost(domainAddress);
-    await createOrUpdateDomain(domainAddress);
-    logger.info('domain created in DB', domainAddress);
+    query = await lookupDomainHost(query);
+    await createOrUpdateQuery(query);
+    logger.info('query created in DB', query);
 
     !req.timedout &&
       res.status(200).send({
-        domain: domainAddress.domain,
-        addresses: domainAddress.addresses.map(({ ip }) => ({ ip })),
-        createdAt: new Date(domainAddress.createdAt).getTime(),
+        domain: query.domain,
+        addresses: query.addresses.map(({ ip }) => ({ ip })),
+        createdAt: new Date(query.createdAt).getTime(),
+        clientIp: query.clientIp
       });
   } catch (error) {
     logger.error('Error happened in lookupControllerHandler', error);
