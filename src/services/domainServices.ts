@@ -16,12 +16,15 @@ function extractDomainHost(requestedDomain: string): string {
   return parsedDomain;
 }
 
-async function lookupDomainHost(domain: string): Promise<IDomain> {
+async function lookupDomainHost(host: IDomain): Promise<IDomain> {
   let address: LookupAddress;
   try {
-    address = await dnsPromises.lookup(domain, 4);
+    address = await dnsPromises.lookup(host.domain, 4);
     logger.info('Address for extracted domain is: ', address);
-    return { ip: address.address, domain };
+    if(host.addresses.findIndex(item => item.ip === address.address) === -1){
+      host.addresses.push({ip: address.address})
+    }
+    return host;
   } catch (error) {
     throw error;
   }

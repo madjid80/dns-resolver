@@ -1,12 +1,12 @@
 import { IDomain } from '@interfaces/domain.interface';
 import Domain from '@models/domain';
 
-async function createDomain(domain: IDomain) {
-  return Domain.create(domain);
+async function createOrUpdateDomain(domain: IDomain) {
+  return Domain.updateOne({ domain: domain.domain }, { $set: { addresses: domain.addresses } }, { upsert: true });
 }
 
 async function getByDomain(domain: string) {
-  return Domain.findOne({domain});
+  return Domain.findOne({ domain });
 }
 
-export { createDomain,getByDomain  };
+export { createOrUpdateDomain, getByDomain };

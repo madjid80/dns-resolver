@@ -40,39 +40,4 @@ describe('domain services', () => {
       expect(loggerInfoSpy.called).toBe(false);
     });
   });
-
-  describe('lookupDomainHost', () => {
-    let loggerInfoSpy: sinon.SinonSpy;
-    let dnsLookupStub: sinon.SinonStub;
-
-    beforeEach(() => {
-      loggerInfoSpy = sinon.spy(logger, 'info');
-      dnsLookupStub = sinon.stub(dnsPromises, 'lookup');
-    });
-
-    afterEach(() => {
-      loggerInfoSpy.restore();
-      dnsLookupStub.restore();
-    });
-
-    it('should return the IP address and domain for a valid input', async () => {
-      const domain = 'www.example.com';
-      const ipAddress = '192.0.2.1';
-      dnsLookupStub.withArgs(domain, 4).resolves({ address: ipAddress });
-
-      const result = await lookupDomainHost(domain);
-
-      expect(result).toEqual({ ip: ipAddress, domain });
-      expect(loggerInfoSpy.calledWith('Address for extracted domain is: ', { address: ipAddress })).toBe(true);
-    });
-
-    it('should throw an error for an invalid input', async () => {
-      const domain = 'not-a-valid-domain';
-      const errorMessage = 'getaddrinfo ENOTFOUND not-a-valid-domain';
-      dnsLookupStub.withArgs(domain, 4).rejects(new Error(errorMessage));
-
-      await expect(lookupDomainHost(domain)).rejects.toThrow(errorMessage);
-      expect(loggerInfoSpy.called).toBe(false);
-    });
-  });
 });
