@@ -9,6 +9,8 @@ export const accessLogMiddleware = (req: Request, res: Response, next: NextFunct
       remoteAddress: req.ip,
       protocol: req.protocol,
       httpVersion: req.httpVersion,
+      params: req.params,
+      query: req.query,
       body: req.body,
     });
 
