@@ -36,7 +36,7 @@ export const lookupControllerHandler = async (req: Request, res: Response) => {
       res.status(200).send(address!.address);
     }
   } catch (error) {
-    logger.error('Error happened in lookupControllerHandler', error)
+    logger.error('Error happened in lookupControllerHandler', error);
     if (!req.timedout) {
       res.status(500).send((error as Error).message);
       return;
