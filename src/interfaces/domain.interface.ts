@@ -4,6 +4,6 @@ export interface IPAddress{
 export interface IDomain{
     domain: string, 
     addresses: IPAddress[],
-    createdAt: number, 
+    createdAt: string, 
     _id ?: string
 }
