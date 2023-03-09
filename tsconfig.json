@@ -9,7 +9,10 @@
     "paths": {
       "@controllers/*": ["src/controllers/*"],
       "@utils/*": ["src/utils/*"],
-      "@bootstrap/*": ["src/bootstrap/*"]
+      "@bootstrap/*": ["src/bootstrap/*"],
+      "@models/*": ["src/models/*"],
+      "@repositories/*": ["src/repositories/*"],
+      "@interfaces/*": ["src/interfaces/*"]
     }
   },
   "include": ["src/**/*.ts"],
