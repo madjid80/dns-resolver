@@ -4,6 +4,7 @@ import extractDomain from 'extract-domain';
 import * as dnsPromises from 'node:dns/promises';
 import { LookupAddress } from 'node:dns';
 import { BadRequestError } from '@errors/badRequestError';
+import { IAddress } from '@interfaces/address';
 
 function extractDomainHost(requestedDomain: string): string {
   const regexForDomain = /[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/;
@@ -18,13 +19,11 @@ function extractDomainHost(requestedDomain: string): string {
 }
 
 async function lookupDomainHost(query: IQuery): Promise<IQuery> {
-  let address: LookupAddress;
+  let address: string[];
   try {
-    address = await dnsPromises.lookup(query.domain, 4);
+    address = await dnsPromises.resolve4(query.domain);
     logger.info('Address for extracted domain is: ', address);
-    if (query.addresses.findIndex((item) => item.ip === address.address) === -1) {
-      query.addresses.push({ ip: address.address });
-    }
+    query.addresses = address.map((ip) => ({ ip } as IAddress));
     return query;
   } catch (error) {
     logger.error(error);

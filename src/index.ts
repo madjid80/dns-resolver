@@ -7,6 +7,7 @@ import { accessLogMiddleware } from './middlewares/logger';
 import timeout from 'connect-timeout';
 import { haltOnTimeout } from './middlewares/timeout';
 import { errorHandlerMiddleware } from './middlewares/errorHandler';
+import { prometheusMiddleware } from './middlewares/prometheus';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,11 +19,13 @@ const db = dbBootstrap.mongoConnect().catch((error) => {
 });
 
 app.use(express.json()) 
+app.use(prometheusMiddleware)
 app.use(accessLogMiddleware);
 app.use(timeout('2s'));
 app.use(controllers.router);
 app.use(haltOnTimeout);
 app.use(errorHandlerMiddleware);
+
 
 const server: Server = app.listen(port, () => {
   logger.info(`Server running on port ${port}`);

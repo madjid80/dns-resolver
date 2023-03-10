@@ -19,6 +19,7 @@ export const accessLogMiddleware = (req: Request, res: Response, next: NextFunct
         logger.info({ method: req.method, url: req.url, status: this.statusCode, controllerResult: body });
         return originalSend.call(this, body);
     };
+    res.set('Content-Type', 'application/json');
 
     next();
   };

@@ -21,7 +21,6 @@ export const lookupControllerHandler = async (req: Request, res: Response) => {
     query = await lookupDomainHost(query);
     await createOrUpdateQuery(query);
     logger.info('query created in DB', query);
-
     !req.timedout &&
       res.status(200).send({
         domain: query.domain,
