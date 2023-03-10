@@ -17,6 +17,7 @@ const db = dbBootstrap.mongoConnect().catch((error) => {
   process.exit(0);
 });
 
+app.use(express.json()) 
 app.use(accessLogMiddleware);
 app.use(timeout('2s'));
 app.use(controllers.router);
