@@ -7,13 +7,14 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@controllers/*": ["src/controllers/*"],
-      "@utils/*": ["src/utils/*"],
       "@bootstrap/*": ["src/bootstrap/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@errors/*": ["src/errors/*"],
+      "@interfaces/*": ["src/interfaces/*"],
       "@models/*": ["src/models/*"],
       "@repositories/*": ["src/repositories/*"],
-      "@interfaces/*": ["src/interfaces/*"],
-      "@services/*": ["src/services/*"]
+      "@services/*": ["src/services/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
   "include": ["src/**/*.ts"],

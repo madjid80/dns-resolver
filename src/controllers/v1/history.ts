@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { logger } from '@utils/logger';
 import { IQuery } from '@interfaces/query';
 import { getAllQuery } from '@repositories/query';
+import { InternalError } from '@errors/internalServerError';
 export const getHistoryHandler = async (req: Request, res: Response) => {
   logger.info('History controller handler started');
   try {
@@ -17,7 +18,7 @@ export const getHistoryHandler = async (req: Request, res: Response) => {
       );
   } catch (error) {
     logger.error('An error thrown at History controller.', error);
-    const { status = 500, message } = error as { status: number; message: string };
-    !req.timedout && res.status(status).send({ message });
+    const internalError: InternalError = new InternalError((error as Error).message)
+    !req.timedout && res.status(internalError.status).send({ message: internalError.message });
   }
 };

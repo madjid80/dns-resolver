@@ -3,11 +3,14 @@ import { logger } from '@utils/logger';
 import { IQuery } from '@interfaces/query';
 import { createOrUpdateQuery, getByDomain } from '@repositories/query';
 import { extractDomainHost, lookupDomainHost } from '@services/domainServices';
+import { BadRequestError } from '@errors/badRequestError';
+import { InternalError } from '@errors/internalServerError';
+import { NotFoundError } from '@errors/notFoundError';
 
 export const lookupControllerHandler = async (req: Request, res: Response) => {
   logger.info('Look up controller handler started');
   const { domain = '' } = req.query;
-  var clientIp: string = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress as string;
+  var clientIp: string = (req.headers['x-forwarded-for'] as string) || (req.socket.remoteAddress as string);
   try {
     const host = extractDomainHost(domain.toString());
     let query: IQuery = await getByDomain(host);
@@ -24,11 +27,17 @@ export const lookupControllerHandler = async (req: Request, res: Response) => {
         domain: query.domain,
         addresses: query.addresses.map(({ ip }) => ({ ip })),
         createdAt: new Date(query.createdAt).getTime(),
-        clientIp: query.clientIp
+        clientIp: query.clientIp,
       });
   } catch (error) {
     logger.error('Error happened in lookupControllerHandler', error);
-    const { status = 500, message } = error as { status: number; message: string };
-    !req.timedout && res.status(status).send({ message });
+    if (error instanceof (BadRequestError || InternalError || NotFoundError)) {
+      const status = (error as (BadRequestError | InternalError | NotFoundError)).status; 
+      const message = (error as (BadRequestError | InternalError | NotFoundError)).message; 
+      !req.timedout && res.status(status).send({ message });
+    }else{
+      !req.timedout && res.status(500).send({ message: (error as Error).message });
+    }
+    
   }
 };
